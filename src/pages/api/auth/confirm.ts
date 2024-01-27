@@ -1,13 +1,18 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import {
+  createServerClient,
+  type CookieOptions,
+  serialize,
+} from '@supabase/ssr';
 import { type EmailOtpType } from '@supabase/supabase-js';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Database } from '@/types/supabase';
-import { NextRequest, NextResponse } from 'next/server';
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  console.log(req);
+
   const url = `${process.env.SITE_URL}${req.url}`;
   const { searchParams } = new URL(url);
   const token_hash = searchParams.get('token_hash');
@@ -24,41 +29,26 @@ export default async function handler(
             return req.cookies[name];
           },
           set(name: string, value: string, options: CookieOptions) {
-            const cookie = [`${name}=${value}`];
-            res.setHeader('Set-Cookie', cookie);
+            res.setHeader('Set-Cookie', serialize(name, value, options));
           },
           remove(name: string, options: CookieOptions) {
-            const cookie = [
-              `${name}=`,
-              'expires=Thu, 01 Jan 1970 00:00:00 GMT',
-            ];
-            res.setHeader('Set-Cookie', cookie);
+            res.setHeader('Set-Cookie', serialize(name, '', options));
           },
         },
       }
     );
 
-    const refreshToken = req.cookies['my-refresh-token'];
-    const accessToken = req.cookies['my-access-token'];
-
-    if (refreshToken && accessToken) {
-      await supabase.auth.setSession({
-        refresh_token: refreshToken,
-        access_token: accessToken,
-      });
-    } else {
-      throw new Error('User is not authenticated.');
-    }
-    await supabase.auth.getUser();
-
-    const { error } = await supabase.auth.verifyOtp({
+    const { data, error } = await supabase.auth.verifyOtp({
       token_hash,
       type,
     });
+    console.log(data);
+    console.log(next);
 
     if (!error) {
       return res.redirect(next);
     } else {
+      return res.redirect('/auth/error');
     }
   }
 }
