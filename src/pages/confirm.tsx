@@ -49,7 +49,7 @@ const CreateAccountForm = () => {
   }, [isSubmitSuccessful, reset]);
 
   return (
-    <div className='bg-white mt-20 max-w-md mx-auto flex flex-col p-4 rounded-lg ring-1 ring-black shadow-2xl'>
+    <div className='bg-slate-50 mt-20 max-w-md mx-auto flex flex-col p-4 rounded-lg ring-1 ring-slate-800 shadow-2xl'>
       {showConfirmationMsg ? (
         <>
           <p className='text-lg text-center font-semibold'>
