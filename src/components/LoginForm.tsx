@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { createBrowserClient } from '@supabase/ssr';
 import { useEffect } from 'react';
+import { useSupabaseBrowserClient } from '@/hooks/useSupabaseBrowserClient';
 
 interface LoginFormData {
   email: string;
@@ -17,10 +17,7 @@ const signupSchema = z.object({
 });
 
 const LoginForm = () => {
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const supabase = useSupabaseBrowserClient();
 
   const {
     register,

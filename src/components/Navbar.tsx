@@ -1,15 +1,24 @@
-import { createBrowserClient } from '@supabase/ssr';
+import { useSupabaseBrowserClient } from '@/hooks/useSupabaseBrowserClient';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 const Navbar = () => {
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const supabase = useSupabaseBrowserClient();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const { data: userData } = useQuery({
+    queryKey: ['user'],
+    queryFn: async () => {
+      const { data } = await supabase.auth.getUser();
+      return data.user;
+    },
+  });
+  console.log(userData);
 
   async function handleSignOut() {
-    const { error } = await supabase.auth.signOut();
-    console.log(error);
+    await supabase.auth.signOut();
+    router.push('/');
   }
 
   return (
@@ -18,9 +27,11 @@ const Navbar = () => {
         Let&apos;s Share Recipes
       </Link>
       <ul className='flex items-center gap-4 text-sm'>
-        <li>
-          <button onClick={handleSignOut}>Sign out</button>
-        </li>
+        {userData && (
+          <li>
+            <button onClick={handleSignOut}>Sign out</button>
+          </li>
+        )}
         <li>
           <Link href={'/login'}>Login</Link>
         </li>
