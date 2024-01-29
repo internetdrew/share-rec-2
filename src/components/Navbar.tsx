@@ -6,22 +6,15 @@ import { useRouter } from 'next/router';
 const Navbar = () => {
   const supabase = useSupabaseBrowserClient();
   const router = useRouter();
-  const { data: userProfile } = useQuery({
-    queryKey: ['profile'],
+  const { data: userData } = useQuery({
+    queryKey: ['user'],
     queryFn: async () => {
-      const { data: userData } = await supabase.auth.getUser();
-      const userId = userData?.user?.id;
-
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select()
-        .eq('id', userId!);
-
-      return profileData;
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      return user;
     },
   });
-
-  const validUserProfile = userProfile?.length;
 
   async function handleSignOut() {
     await supabase.auth.signOut();
@@ -34,14 +27,17 @@ const Navbar = () => {
         Let&apos;s Share Recipes
       </Link>
       <ul className='flex items-center gap-4 text-sm'>
-        {validUserProfile && (
+        {userData ? (
           <li>
-            <button onClick={handleSignOut}>Sign out</button>
+            <button onClick={handleSignOut} className='btn-secondary'>
+              Sign out
+            </button>
+          </li>
+        ) : (
+          <li>
+            <Link href={'/login'}>Login</Link>
           </li>
         )}
-        <li>
-          <Link href={'/login'}>Login</Link>
-        </li>
       </ul>
     </nav>
   );

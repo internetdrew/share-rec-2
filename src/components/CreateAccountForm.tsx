@@ -40,7 +40,7 @@ const CreateAccountForm = () => {
     await supabase.auth.signInWithOtp({
       email: createAccountData.email,
       options: {
-        emailRedirectTo: 'http://localhost:3000/login',
+        emailRedirectTo: 'http://localhost:3000/home',
         data: {
           displayName: createAccountData.displayName,
         },

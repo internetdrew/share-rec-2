@@ -26,14 +26,8 @@ export async function getServerSideProps({
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  const userId = user?.id;
 
-  const { data: userData } = await supabase
-    .from('profiles')
-    .select()
-    .eq('id', userId as string);
-
-  if (!userId || userData?.length === 0) {
+  if (!user) {
     return {
       redirect: {
         destination: '/',

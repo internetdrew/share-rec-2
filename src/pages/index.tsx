@@ -10,7 +10,7 @@ export default function Home() {
           Share your favorite recipes, effortlessly!{' '}
         </h1>
         <p className='text-lg mt-4 text-gray-800 max-w-2xl mx-auto'>
-          Share recipes with friends, customize family recipes, and never have
+          Share recipes with friends, modify recipes from others, and never have
           to ask Mom how to make her lasagna ever again.
         </p>
       </header>
@@ -31,14 +31,7 @@ export async function getServerSideProps({
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: profileData } = await supabase
-    .from('profiles')
-    .select()
-    .eq('id', user?.id!);
-
-  const registeredProfile = profileData?.length;
-
-  if (registeredProfile) {
+  if (user) {
     return {
       redirect: {
         destination: '/home',

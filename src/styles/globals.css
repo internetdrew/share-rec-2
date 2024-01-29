@@ -15,4 +15,7 @@
   .btn-primary {
     @apply bg-slate-800 text-yellow-50 ring-1 ring-slate-800 rounded-lg py-2 px-4 duration-150 font-medium hover:shadow-md hover:bg-slate-900;
   }
+  .btn-secondary {
+    @apply ring-1 ring-slate-800 text-slate-800 rounded-lg py-2 px-4 duration-150 font-medium hover:shadow-md hover:text-yellow-50 hover:bg-slate-800;
+  }
 }
