@@ -4,15 +4,15 @@
 
 @layer base {
   body {
-    @apply bg-orange-50;
-  }
-}
-
-@layer components {
-  .btn-primary {
-    @apply bg-slate-800 text-slate-50 rounded-lg py-2 px-4 font-medium hover:shadow-md;
+    @apply bg-slate-50 text-slate-800;
   }
   input {
     @apply ring-1 ring-slate-800 py-2.5 px-3 rounded-md;
+  }
+}
+
+@layer utilities {
+  .btn-primary {
+    @apply bg-slate-800 text-yellow-50 ring-1 ring-slate-800 rounded-lg py-2 px-4 duration-150 font-medium hover:shadow-md hover:bg-slate-900;
   }
 }

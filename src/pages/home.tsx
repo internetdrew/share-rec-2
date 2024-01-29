@@ -7,9 +7,6 @@ interface HomeProps {
 }
 
 const Home = ({ userId, email }: HomeProps) => {
-  console.log(userId);
-  console.log(email);
-
   return (
     <div>
       <p>I am the home page for user {userId}</p>
@@ -28,10 +25,15 @@ export async function getServerSideProps({
 
   const {
     data: { user },
-    error,
   } = await supabase.auth.getUser();
+  const userId = user?.id;
 
-  if (error || !user) {
+  const { data: userData } = await supabase
+    .from('profiles')
+    .select()
+    .eq('id', userId as string);
+
+  if (!userId || userData?.length === 0) {
     return {
       redirect: {
         destination: '/',
@@ -42,8 +44,8 @@ export async function getServerSideProps({
 
   return {
     props: {
-      userId: user.id,
-      email: user.email,
+      userId: user?.id,
+      email: user?.email,
     },
   };
 }
