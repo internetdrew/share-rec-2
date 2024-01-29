@@ -49,7 +49,7 @@ const LoginForm = () => {
       <Head>
         <title>Login to Let&apos;s Share Recipes</title>
       </Head>
-      <div className='bg-white mt-20 max-w-md mx-auto flex flex-col p-4 rounded-lg ring-1 ring-black shadow-2xl'>
+      <div className='bg-slate-50 mt-20 max-w-md mx-auto flex flex-col p-4 rounded-lg ring-1 ring-slate-800 shadow-2xl'>
         <form
           className='mt-6 flex flex-col gap-4'
           onSubmit={handleSubmit(onLogin)}

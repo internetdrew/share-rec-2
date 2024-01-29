@@ -1,10 +1,11 @@
 import { useSupabaseBrowserClient } from '@/hooks/useSupabaseBrowserClient';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 const Navbar = () => {
   const supabase = useSupabaseBrowserClient();
+
   const router = useRouter();
   const { data: userData } = useQuery({
     queryKey: ['user'],
@@ -18,7 +19,7 @@ const Navbar = () => {
 
   async function handleSignOut() {
     await supabase.auth.signOut();
-    router.push('/');
+    router.reload();
   }
 
   return (
@@ -35,7 +36,9 @@ const Navbar = () => {
           </li>
         ) : (
           <li>
-            <Link href={'/login'}>Login</Link>
+            <Link href={'/login'} className='btn-primary'>
+              Login
+            </Link>
           </li>
         )}
       </ul>
