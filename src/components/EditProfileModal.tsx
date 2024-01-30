@@ -1,25 +1,77 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 interface EditProfileModalProps {
-  showModalState: boolean;
+  profileData:
+    | {
+        avatar_url: string | null;
+        created_at: string;
+        display_name: string;
+        email: string;
+        id: string;
+        username: string;
+      }[]
+    | null
+    | undefined;
+  completeProfile: boolean;
 }
 
-export const EditProfileModal = ({ showModalState }: EditProfileModalProps) => {
+export const EditProfileModal = ({
+  completeProfile,
+  profileData,
+}: EditProfileModalProps) => {
+  const dialogEl = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    !completeProfile && dialogEl.current?.showModal();
+  }, [completeProfile]);
+
   return (
-    <>
-      {showModalState ? (
-        <dialog open className='min-w-96'>
-          <form className='form'>
-            <header className='text-center text-xl font-semibold mb-4'>
-              Edit Profile
-            </header>
-            <div>
-              <label>Display name</label>
-              <input type='text' className='w-full' />
+    <dialog ref={dialogEl} className='form max-w-sm'>
+      <form>
+        <header className='text-xl font-semibold mb-1'>
+          {completeProfile ? 'Edit' : 'Complete'} Profile
+        </header>
+        <span className='text-slate-600'>
+          {completeProfile
+            ? 'Provide details about yourself so others can easily identify you in shared spaces.'
+            : 'To complete your profile, please choose a username.'}
+        </span>
+        <hr className='my-2' />
+        <p className='font-semibold text-lg mb-2'>Basic Information</p>
+        <section className='flex justify-between items-center'>
+          <div>
+            <p className='text-sm'>Profile photo</p>
+            <small className='text-slate-600'>Recommended 300 x 300</small>
+            <div className='flex items-center gap-2 mt-2'>
+              <button className='tiny-btn'>Change</button>
+              <button className='tiny-btn'>Remove</button>
             </div>
-          </form>
-        </dialog>
-      ) : null}
-    </>
+          </div>
+          <div className='bg-red-200 h-24 w-24 rounded-full'></div>
+        </section>
+        <section className='flex flex-col gap-4 mt-4'>
+          <div className='flex flex-col gap-1'>
+            <label>Username</label>
+            <input
+              autoFocus={!completeProfile}
+              type='text'
+              className='w-full'
+              placeholder='Please enter a username...'
+            />
+          </div>
+          <div className='flex flex-col gap-1'>
+            <label>Display name</label>
+            <input
+              type='text'
+              className='w-full'
+              placeholder='Ex. Nyesha Arrington'
+            />
+          </div>
+        </section>
+        <button autoFocus className='btn-primary w-full mt-4'>
+          Save
+        </button>
+      </form>
+    </dialog>
   );
 };

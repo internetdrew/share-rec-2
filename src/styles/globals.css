@@ -7,7 +7,7 @@
     @apply bg-slate-50 text-slate-800;
   }
   input {
-    @apply ring-1 ring-slate-800 py-2.5 px-3 rounded-md;
+    @apply ring-1 ring-slate-800 p-2 rounded-md;
   }
 }
 
@@ -19,6 +19,10 @@
     @apply ring-1 ring-slate-800 text-slate-800 rounded-lg py-2 px-4 duration-150 font-medium hover:shadow-md hover:text-yellow-50 hover:bg-slate-800;
   }
   .form {
-    @apply flex flex-col ring-1 ring-slate-800 p-4 rounded-lg;
+    @apply bg-slate-50 flex flex-col ring-1 ring-slate-800 p-4 rounded-lg;
+  }
+
+  .tiny-btn {
+    @apply text-xs ring-1 ring-slate-800 py-1 px-2 rounded-md font-medium duration-100 hover:bg-slate-800 hover:text-slate-50;
   }
 }

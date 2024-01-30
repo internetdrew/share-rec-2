@@ -11,7 +11,7 @@ interface HomeProps {
 }
 
 const Home = ({ userId, email }: HomeProps) => {
-  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [completeProfile, setCompleteProfile] = useState(false);
   const supabase = useSupabaseBrowserClient();
 
   const { data: profileData } = useQuery({
@@ -26,22 +26,24 @@ const Home = ({ userId, email }: HomeProps) => {
   });
 
   useEffect(() => {
-    if (profileData?.length === 0) {
-      setShowProfileModal(true);
+    if (profileData?.length) {
+      setCompleteProfile(profileData?.length > 0);
     }
   }, [profileData?.length]);
 
   return (
-    <div className='bg-red-100'>
-      {showProfileModal ? (
-        <EditProfileModal showModalState={showProfileModal} />
-      ) : (
-        <div>
-          <p>I am the home page for user {userId}</p>
-          <p>You can message them at {email}</p>
-        </div>
+    <>
+      <div>
+        <p>I am the home page for user {userId}</p>
+        <p>You can message them at {email}</p>
+      </div>
+      {!completeProfile && (
+        <EditProfileModal
+          profileData={profileData}
+          completeProfile={completeProfile}
+        />
       )}
-    </div>
+    </>
   );
 };
 
