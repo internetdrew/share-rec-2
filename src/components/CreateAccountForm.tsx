@@ -80,9 +80,7 @@ const CreateAccountForm = () => {
                 <h1>We&apos;re excited for you to join!</h1>
               </header>
               <div className='flex flex-col gap-1'>
-                <label htmlFor='email' className='text-sm font-medium'>
-                  Display name:
-                </label>
+                <label htmlFor='email'>Display name:</label>
                 <input
                   type='text'
                   placeholder='Ex. Bobby Filet'
@@ -95,9 +93,7 @@ const CreateAccountForm = () => {
                 )}
               </div>
               <div className='flex flex-col gap-1'>
-                <label htmlFor='email' className='text-sm font-medium'>
-                  Email:
-                </label>
+                <label htmlFor='email'>Email:</label>
                 <input
                   type='text'
                   placeholder='Enter your email address'

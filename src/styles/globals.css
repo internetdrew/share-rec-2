@@ -9,6 +9,9 @@
   input {
     @apply ring-1 ring-slate-800 p-2 rounded-md;
   }
+  label {
+    @apply text-sm font-medium;
+  }
 }
 
 @layer components {

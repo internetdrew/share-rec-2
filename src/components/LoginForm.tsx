@@ -58,9 +58,7 @@ const LoginForm = () => {
             Let&apos;s get you logged in...
           </header>
           <div className='flex flex-col gap-1'>
-            <label htmlFor='email' className='text-sm font-medium'>
-              Email:
-            </label>
+            <label htmlFor='email'>Email:</label>
             <input
               type='text'
               placeholder='Enter your email address'
