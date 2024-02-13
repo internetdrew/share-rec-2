@@ -6,7 +6,9 @@ import {
 import { type GetServerSidePropsContext } from 'next';
 import { Database } from '@/types/supabase';
 
-export const createClient = (context: GetServerSidePropsContext) => {
+export const getSupabaseServerPropsClient = (
+  context: GetServerSidePropsContext
+) => {
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,

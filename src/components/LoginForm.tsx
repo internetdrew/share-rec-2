@@ -3,9 +3,10 @@ import Link from 'next/link';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useSupabaseBrowserClient } from '@/hooks/useSupabaseBrowserClient';
 import Head from 'next/head';
 import toast from 'react-hot-toast';
+import FormConfirmationMessage from './FormConfirmationMessage';
+import { getSupabaseBrowserClient } from '@/utils/supabase/components';
 
 interface LoginFormData {
   email: string;
@@ -20,7 +21,7 @@ const signupSchema = z.object({
 
 const LoginForm = () => {
   const [showConfirmationMsg, setShowConfirmationMsg] = useState(false);
-  const supabase = useSupabaseBrowserClient();
+  const supabase = getSupabaseBrowserClient();
 
   const {
     register,
@@ -39,8 +40,27 @@ const LoginForm = () => {
       },
     });
 
+    if (!error) {
+      setShowConfirmationMsg(true);
+    }
+
     if (error) {
-      toast.error('You need to sign up before you can login.');
+      const errorStatus = error.status;
+      switch (errorStatus) {
+        case 400: {
+          toast.error('You need to create an account to login.');
+          break;
+        }
+        case 429: {
+          toast.error(
+            'You have made too many requests. Please try again later.'
+          );
+          break;
+        }
+        default: {
+          toast.error('Something went wrong...');
+        }
+      }
     }
   };
 
@@ -56,15 +76,11 @@ const LoginForm = () => {
         <title>Login to Let&apos;s Share Recipes</title>
       </Head>
       <div className='bg-slate-50 mt-20 max-w-md mx-auto flex flex-col p-4 rounded-lg ring-1 ring-slate-800 shadow-2xl'>
-        {!showConfirmationMsg ? (
-          <>
-            <p className='text-lg text-center font-semibold'>
-              You&apos;re almost there...
-            </p>
-            <p className='text-center'>
-              Please check your inbox for your login link.
-            </p>
-          </>
+        {showConfirmationMsg ? (
+          <FormConfirmationMessage
+            heading="You're almost there..."
+            message='Please check your inbox for your login link.'
+          />
         ) : (
           <>
             <form
@@ -75,7 +91,7 @@ const LoginForm = () => {
                 Let&apos;s get you logged in...
               </header>
               <div className='flex flex-col gap-1'>
-                <label htmlFor='email'>Email:</label>
+                <label htmlFor='email'>Email</label>
                 <input
                   type='text'
                   placeholder='Enter your email address'

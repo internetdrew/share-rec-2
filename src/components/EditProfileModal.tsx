@@ -1,38 +1,27 @@
 import React, { useEffect, useRef } from 'react';
+import { Tables } from '@/types/supabase';
 
-interface EditProfileModalProps {
-  profileData:
-    | {
-        avatar_url: string | null;
-        created_at: string;
-        display_name: string;
-        email: string;
-        id: string;
-        username: string;
-      }[]
-    | null
-    | undefined;
-  completeProfile: boolean;
-}
+type UserProfile = Tables<'profiles'>;
 
 export const EditProfileModal = ({
-  completeProfile,
   profileData,
-}: EditProfileModalProps) => {
+}: {
+  profileData: UserProfile | undefined;
+}) => {
   const dialogEl = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
-    !completeProfile && dialogEl.current?.showModal();
-  }, [completeProfile]);
+    !profileData && dialogEl.current?.showModal();
+  }, [profileData]);
 
   return (
     <dialog ref={dialogEl} className='form max-w-sm'>
       <form>
         <header className='text-xl font-semibold mb-1'>
-          {completeProfile ? 'Edit' : 'Complete'} Profile
+          {profileData ? 'Edit' : 'Complete'} Profile
         </header>
         <span className='text-slate-600'>
-          {completeProfile
+          {profileData
             ? 'Provide details about yourself so others can easily identify you in shared spaces.'
             : 'To complete your profile, please choose a username.'}
         </span>
@@ -53,7 +42,7 @@ export const EditProfileModal = ({
           <div className='flex flex-col gap-1'>
             <label>Username</label>
             <input
-              autoFocus={!completeProfile}
+              autoFocus={!profileData}
               type='text'
               className='w-full'
               placeholder='Please enter a username...'

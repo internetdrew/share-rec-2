@@ -1,20 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { GetServerSidePropsContext } from 'next';
-import { useEffect, useState } from 'react';
 import { EditProfileModal } from '@/components/EditProfileModal';
-import { createClient } from '@/utils/supabase/server-props';
-import { createClient as componentClient } from '@/utils/supabase/components';
+import { getSupabaseServerPropsClient } from '@/utils/supabase/server-props';
+import { getSupabaseBrowserClient } from '@/utils/supabase/components';
 import { User } from '@supabase/supabase-js';
 
-interface HomeProps {
-  userId: string;
-  email: string;
-  displayName: string;
-}
-
 const Home = ({ user }: { user: User }) => {
-  const [completeProfile, setCompleteProfile] = useState(false);
-  const supabase = componentClient();
+  const supabase = getSupabaseBrowserClient();
 
   const { data: profileData } = useQuery({
     queryKey: ['profile', user.id],
@@ -27,11 +19,7 @@ const Home = ({ user }: { user: User }) => {
     },
   });
 
-  useEffect(() => {
-    if (profileData?.length) {
-      setCompleteProfile(profileData?.length > 0);
-    }
-  }, [profileData?.length]);
+  const userProfile = profileData?.[0];
 
   return (
     <>
@@ -40,12 +28,7 @@ const Home = ({ user }: { user: User }) => {
         <p>You can message them at {user.email}</p>
         <p>Call them {user.user_metadata.displayName} if you&apos;re nasty.</p>
       </div>
-      {!completeProfile && (
-        <EditProfileModal
-          profileData={profileData}
-          completeProfile={completeProfile}
-        />
-      )}
+      {!userProfile && <EditProfileModal profileData={userProfile} />}
     </>
   );
 };
@@ -53,7 +36,7 @@ const Home = ({ user }: { user: User }) => {
 export default Home;
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const supabase = createClient(context);
+  const supabase = getSupabaseServerPropsClient(context);
 
   const { data, error } = await supabase.auth.getUser();
 

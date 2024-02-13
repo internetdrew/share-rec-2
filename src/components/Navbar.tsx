@@ -1,10 +1,10 @@
-import { useSupabaseBrowserClient } from '@/hooks/useSupabaseBrowserClient';
+import { getSupabaseBrowserClient } from '@/utils/supabase/components';
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 const Navbar = () => {
-  const supabase = useSupabaseBrowserClient();
+  const supabase = getSupabaseBrowserClient();
   const router = useRouter();
 
   const { data: userData } = useQuery({
@@ -16,7 +16,6 @@ const Navbar = () => {
       return user;
     },
   });
-  console.log(userData);
 
   async function handleSignOut() {
     await supabase.auth.signOut();

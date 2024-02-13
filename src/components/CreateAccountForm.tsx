@@ -2,14 +2,14 @@ import Link from 'next/link';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Head from 'next/head';
-import { useSupabaseBrowserClient } from '@/hooks/useSupabaseBrowserClient';
-import { useQuery } from '@tanstack/react-query';
+import FormConfirmationMessage from './FormConfirmationMessage';
+import toast from 'react-hot-toast';
+import { getSupabaseBrowserClient } from '@/utils/supabase/components';
 
 interface CreateAccountFormData {
   email: string;
-  displayName: string;
 }
 
 const createAccountSchema = z.object({
@@ -17,14 +17,14 @@ const createAccountSchema = z.object({
     .string()
     .email({ message: 'Please enter a valid email to login.' })
     .min(5, { message: 'Email address seems a bit...short..?' }),
-  displayName: z
-    .string()
-    .min(2, { message: 'Display names must be at least 2 characters long.' }),
+  // displayName: z
+  //   .string()
+  //   .min(2, { message: 'Display names must be at least 2 characters long.' }),
 });
 
 const CreateAccountForm = () => {
   const [showConfirmationMsg, setShowConfirmationMsg] = useState(false);
-  const supabase = useSupabaseBrowserClient();
+  const supabase = getSupabaseBrowserClient();
 
   const {
     register,
@@ -35,19 +35,29 @@ const CreateAccountForm = () => {
     resolver: zodResolver(createAccountSchema),
   });
 
-  const onConfirm: SubmitHandler<
-    CreateAccountFormData
-  > = async createAccountData => {
-    await supabase.auth.signInWithOtp({
-      email: createAccountData.email,
-      options: {
-        emailRedirectTo: 'http://localhost:3000/home',
-        data: {
-          displayName: createAccountData.displayName,
-        },
-      },
+  const onConfirm: SubmitHandler<CreateAccountFormData> = async data => {
+    const { error } = await supabase.auth.signInWithOtp({
+      email: data.email,
     });
-    setShowConfirmationMsg(true);
+
+    if (!error) {
+      setShowConfirmationMsg(true);
+    }
+
+    if (error) {
+      const errorStatus = error.status;
+      switch (errorStatus) {
+        case 429: {
+          toast.error(
+            'You have made too many requests. Please try again later.'
+          );
+          break;
+        }
+        default: {
+          toast.error('Something went wrong...');
+        }
+      }
+    }
   };
 
   useEffect(() => {
@@ -63,14 +73,10 @@ const CreateAccountForm = () => {
       </Head>
       <div className='bg-slate-50 max-w-md mx-auto flex flex-col p-4 rounded-lg ring-1 ring-slate-800 shadow-2xl'>
         {showConfirmationMsg ? (
-          <>
-            <p className='text-lg text-center font-semibold'>
-              Check your inbox...
-            </p>
-            <p className='text-center'>
-              You should have a confirmation link waiting for you.
-            </p>
-          </>
+          <FormConfirmationMessage
+            heading='Check your inbox...'
+            message='You should have a confirmation link waiting for you.'
+          />
         ) : (
           <>
             <form
@@ -81,20 +87,7 @@ const CreateAccountForm = () => {
                 <h1>We&apos;re excited for you to join!</h1>
               </header>
               <div className='flex flex-col gap-1'>
-                <label htmlFor='email'>Display name:</label>
-                <input
-                  type='text'
-                  placeholder='Ex. Bobby Filet'
-                  {...register('displayName')}
-                />
-                {errors.displayName && (
-                  <small className='text-red-700'>
-                    {errors.displayName.message}
-                  </small>
-                )}
-              </div>
-              <div className='flex flex-col gap-1'>
-                <label htmlFor='email'>Email:</label>
+                <label htmlFor='email'>Email</label>
                 <input
                   type='text'
                   placeholder='Enter your email address'
@@ -105,7 +98,7 @@ const CreateAccountForm = () => {
                 )}
               </div>
               <button className='btn-primary rounded-md'>
-                Create my account
+                Confirm my email address
               </button>
             </form>
             <p className='text-center text-sm mt-6 text-slate-700'>
