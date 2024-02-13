@@ -1,26 +1,28 @@
-import { useSupabaseBrowserClient } from '@/hooks/useSupabaseBrowserClient';
-import { getSupabaseServerClient } from '@/supabase/getSupabaseServerClient';
 import { useQuery } from '@tanstack/react-query';
 import { GetServerSidePropsContext } from 'next';
 import { useEffect, useState } from 'react';
 import { EditProfileModal } from '@/components/EditProfileModal';
+import { createClient } from '@/utils/supabase/server-props';
+import { createClient as componentClient } from '@/utils/supabase/components';
+import { User } from '@supabase/supabase-js';
 
 interface HomeProps {
   userId: string;
   email: string;
+  displayName: string;
 }
 
-const Home = ({ userId, email }: HomeProps) => {
+const Home = ({ user }: { user: User }) => {
   const [completeProfile, setCompleteProfile] = useState(false);
-  const supabase = useSupabaseBrowserClient();
+  const supabase = componentClient();
 
   const { data: profileData } = useQuery({
-    queryKey: ['profile', userId],
+    queryKey: ['profile', user.id],
     queryFn: async () => {
       const { data } = await supabase
         .from('profiles')
         .select()
-        .eq('id', userId);
+        .eq('id', user.id);
       return data;
     },
   });
@@ -34,8 +36,9 @@ const Home = ({ userId, email }: HomeProps) => {
   return (
     <>
       <div>
-        <p>I am the home page for user {userId}</p>
-        <p>You can message them at {email}</p>
+        <p>I am the home page for user {user.id}</p>
+        <p>You can message them at {user.email}</p>
+        <p>Call them {user.user_metadata.displayName} if you&apos;re nasty.</p>
       </div>
       {!completeProfile && (
         <EditProfileModal
@@ -49,17 +52,12 @@ const Home = ({ userId, email }: HomeProps) => {
 
 export default Home;
 
-export async function getServerSideProps({
-  req,
-  res,
-}: GetServerSidePropsContext) {
-  const supabase = getSupabaseServerClient(req, res);
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const supabase = createClient(context);
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data, error } = await supabase.auth.getUser();
 
-  if (!user) {
+  if (error || !data) {
     return {
       redirect: {
         destination: '/',
@@ -70,8 +68,7 @@ export async function getServerSideProps({
 
   return {
     props: {
-      userId: user?.id,
-      email: user?.email,
+      user: data.user,
     },
   };
 }

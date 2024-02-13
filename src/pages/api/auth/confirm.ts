@@ -1,29 +1,39 @@
 import { type EmailOtpType } from '@supabase/supabase-js';
-import { NextApiRequest, NextApiResponse } from 'next';
-import { getSupabaseServerClient } from '@/supabase/getSupabaseServerClient';
+import type { NextApiRequest, NextApiResponse } from 'next';
+
+import { createClient } from '@/utils/supabase/api';
+
+function stringOrFirstString(item: string | string[] | undefined) {
+  return Array.isArray(item) ? item[0] : item;
+}
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const url = `${process.env.SITE_URL}${req.url}`;
-  const { searchParams } = new URL(url);
-  const token_hash = searchParams.get('token_hash');
-  const type = searchParams.get('type') as EmailOtpType | null;
-  const next = searchParams.get('next') ?? '/';
+  if (req.method !== 'GET') {
+    res.status(405).appendHeader('Allow', 'GET').end();
+    return;
+  }
+
+  const queryParams = req.query;
+  const token_hash = stringOrFirstString(queryParams.token_hash);
+  const type = stringOrFirstString(queryParams.type);
+
+  let next = '/error';
 
   if (token_hash && type) {
-    const supabase = getSupabaseServerClient(req, res);
-
+    const supabase = createClient(req, res);
     const { error } = await supabase.auth.verifyOtp({
+      type: type as EmailOtpType,
       token_hash,
-      type,
     });
-
-    if (!error) {
-      return res.redirect(next);
+    if (error) {
+      console.error(error);
     } else {
-      return res.redirect('/auth/error');
+      next = stringOrFirstString(queryParams.next) || '/';
     }
   }
+
+  res.redirect(next);
 }

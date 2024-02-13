@@ -5,8 +5,8 @@ import { useRouter } from 'next/router';
 
 const Navbar = () => {
   const supabase = useSupabaseBrowserClient();
-
   const router = useRouter();
+
   const { data: userData } = useQuery({
     queryKey: ['user'],
     queryFn: async () => {
@@ -16,6 +16,7 @@ const Navbar = () => {
       return user;
     },
   });
+  console.log(userData);
 
   async function handleSignOut() {
     await supabase.auth.signOut();
@@ -35,11 +36,18 @@ const Navbar = () => {
             </button>
           </li>
         ) : (
-          <li>
-            <Link href={'/login'} className='btn-primary'>
-              Login
-            </Link>
-          </li>
+          <>
+            <li>
+              <Link href={'/login'} className='btn-secondary'>
+                Login
+              </Link>
+            </li>
+            <li>
+              <Link href={'/'} className='btn-primary'>
+                Sign up
+              </Link>
+            </li>
+          </>
         )}
       </ul>
     </nav>

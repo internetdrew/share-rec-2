@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import Head from 'next/head';
 import { useSupabaseBrowserClient } from '@/hooks/useSupabaseBrowserClient';
+import { useQuery } from '@tanstack/react-query';
 
 interface CreateAccountFormData {
   email: string;
@@ -64,10 +65,10 @@ const CreateAccountForm = () => {
         {showConfirmationMsg ? (
           <>
             <p className='text-lg text-center font-semibold'>
-              You&apos;re almost there...
+              Check your inbox...
             </p>
             <p className='text-center'>
-              Please check your inbox to confirm your email address.
+              You should have a confirmation link waiting for you.
             </p>
           </>
         ) : (

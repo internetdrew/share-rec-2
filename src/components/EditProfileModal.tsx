@@ -47,7 +47,7 @@ export const EditProfileModal = ({
               <button className='tiny-btn'>Remove</button>
             </div>
           </div>
-          <div className='bg-red-200 h-24 w-24 rounded-full'></div>
+          <div className='bg-red-200 h-20 w-20 rounded-full mr-4'></div>
         </section>
         <section className='flex flex-col gap-4 mt-4'>
           <div className='flex flex-col gap-1'>
