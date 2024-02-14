@@ -1,5 +1,5 @@
 import CreateAccountForm from '@/components/CreateAccountForm';
-import { createClient } from '@/utils/supabase/server-props';
+import { getSupabaseServerPropsClient } from '@/utils/supabase/server-props';
 import { GetServerSidePropsContext } from 'next';
 
 export default function Home() {
@@ -22,7 +22,7 @@ export default function Home() {
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const supabase = createClient(context);
+  const supabase = getSupabaseServerPropsClient(context);
 
   const {
     data: { user },
