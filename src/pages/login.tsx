@@ -1,5 +1,5 @@
 import LoginForm from '@/components/LoginForm';
-import { createClient } from '@/utils/supabase/server-props';
+import { getSupabaseServerPropsClient } from '@/utils/supabase/server-props';
 import { GetServerSidePropsContext } from 'next';
 
 const Login = () => {
@@ -9,7 +9,7 @@ const Login = () => {
 export default Login;
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const supabase = createClient(context);
+  const supabase = getSupabaseServerPropsClient(context);
 
   const {
     data: { user },
