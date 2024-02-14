@@ -17,9 +17,6 @@ const createAccountSchema = z.object({
     .string()
     .email({ message: 'Please enter a valid email to login.' })
     .min(5, { message: 'Email address seems a bit...short..?' }),
-  // displayName: z
-  //   .string()
-  //   .min(2, { message: 'Display names must be at least 2 characters long.' }),
 });
 
 const CreateAccountForm = () => {
