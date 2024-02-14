@@ -8,7 +8,7 @@ import { User } from '@supabase/supabase-js';
 const Home = ({ user }: { user: User }) => {
   const supabase = getSupabaseBrowserClient();
 
-  const { data: profileData } = useQuery({
+  const { data: profileData, isFetching } = useQuery({
     queryKey: ['profile', user.id],
     queryFn: async () => {
       const { data } = await supabase
@@ -28,7 +28,9 @@ const Home = ({ user }: { user: User }) => {
         <p>You can message them at {user.email}</p>
         <p>Call them {user.user_metadata.displayName} if you&apos;re nasty.</p>
       </div>
-      {!userProfile && <EditProfileModal profileData={userProfile} />}
+      {!isFetching && !userProfile && (
+        <EditProfileModal profileData={userProfile} email={user.email!} />
+      )}
     </>
   );
 };

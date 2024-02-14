@@ -23,11 +23,11 @@ const Navbar = () => {
   }
 
   return (
-    <nav className='flex items-center justify-between py-4'>
-      <Link href={'/'} className='text-2xl font-bold'>
+    <nav className='items-center justify-between py-4 sm:flex'>
+      <Link href={'/'} className='text-2xl font-bold text-center'>
         Let&apos;s Share Recipes
       </Link>
-      <ul className='flex items-center gap-4 text-sm'>
+      <ul className='flex items-center gap-2 text-xs w-auto justify-center mt-6 sm:mt-0 sm:text-sm sm:justify-end'>
         {userData ? (
           <li>
             <button onClick={handleSignOut} className='btn-secondary'>

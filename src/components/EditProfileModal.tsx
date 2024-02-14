@@ -5,12 +5,30 @@ import { FaUser } from 'react-icons/fa';
 import Image from 'next/image';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import debounce from 'lodash.debounce';
+import { useMutation } from '@tanstack/react-query';
+
+interface EditProfileModalProps {
+  profileData: UserProfile | undefined;
+  email: string;
+}
 
 interface EditProfileFormData {
   email: string;
   displayName: string;
   username: string;
 }
+
+const validateUsername = debounce(async value => {
+  if (value) {
+    const res = await fetch(`/api/username/validate?username=${value}`);
+    if (!res.ok) throw new Error('Something went wrong.');
+
+    const data = await res.json();
+    const isUsernameAvailable = data.isAvailable;
+    return isUsernameAvailable;
+  }
+}, 300);
 
 const editProfileSchema = z.object({
   email: z
@@ -23,18 +41,12 @@ const editProfileSchema = z.object({
   username: z
     .string()
     .min(3, { message: 'Your username must be at least 3 characters long' })
+    .regex(/^[a-zA-Z0-9_]+$/, {
+      message: 'Usernames can only contain letters, numbers, and underscores',
+    })
     .refine(
       async value => {
-        if (value) {
-          const res = await fetch(`/api/username/validate?username=${value}`);
-          console.log(res);
-          if (res.ok) {
-            const data = await res.json();
-            const availability = data.isAvailable;
-            console.log(availability);
-            return availability;
-          }
-        }
+        return await validateUsername(value);
       },
       { message: 'This username is already taken.' }
     ),
@@ -44,23 +56,32 @@ type UserProfile = Tables<'profiles'>;
 
 export const EditProfileModal = ({
   profileData,
-}: {
-  profileData: UserProfile | undefined;
-}) => {
+  email,
+}: EditProfileModalProps) => {
   const dialogEl = useRef<HTMLDialogElement>(null);
+  const createProfile = useMutation({
+    mutationFn: (userData: EditProfileFormData) => {
+      return fetch('/api/profile/update', {
+        method: 'POST',
+        body: JSON.stringify(userData),
+      });
+    },
+  });
 
   const {
-    watch,
     register,
     handleSubmit,
     reset,
     formState: { errors, isSubmitSuccessful },
   } = useForm<EditProfileFormData>({
     resolver: zodResolver(editProfileSchema),
+    defaultValues: {
+      email,
+    },
   });
 
   const onSubmit: SubmitHandler<EditProfileFormData> = data => {
-    console.log(data);
+    createProfile.mutateAsync(data);
   };
 
   useEffect(() => {
@@ -70,6 +91,12 @@ export const EditProfileModal = ({
       dialogEl.current?.close();
     }
   }, [profileData]);
+
+  useEffect(() => {
+    if (isSubmitSuccessful) {
+      reset();
+    }
+  }, [isSubmitSuccessful, reset]);
 
   return (
     <dialog ref={dialogEl} className='form max-w-sm'>
@@ -103,15 +130,14 @@ export const EditProfileModal = ({
         </section>
         <section className='flex flex-col gap-4 mt-4'>
           <div className='flex flex-col gap-1'>
-            <label>Username</label>
+            <label>Email</label>
             <input
-              autoFocus={!profileData}
               type='text'
               className='w-full'
-              placeholder='Please enter a username...'
-              {...register('username')}
+              placeholder='Ex. Nyesha Arrington'
+              {...register('email')}
             />
-            <small className='text-red-600'>{errors.username?.message}</small>
+            <small className='text-red-600'>{errors.email?.message}</small>
           </div>
           <div className='flex flex-col gap-1'>
             <label>Display name</label>
@@ -126,13 +152,15 @@ export const EditProfileModal = ({
             </small>
           </div>
           <div className='flex flex-col gap-1'>
-            <label>Email</label>
+            <label>Username</label>
             <input
-              type='email'
+              autoFocus={!profileData}
+              type='text'
               className='w-full'
-              placeholder='Ex. Nyesha Arrington'
-              {...register('email')}
+              placeholder='Please enter a username...'
+              {...register('username')}
             />
+            <small className='text-red-600'>{errors.username?.message}</small>
           </div>
         </section>
         <button autoFocus className='btn-primary w-full mt-4'>
