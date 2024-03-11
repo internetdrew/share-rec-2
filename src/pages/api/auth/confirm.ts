@@ -15,7 +15,6 @@ export default async function handler(
     res.status(405).appendHeader('Allow', 'GET').end();
     return;
   }
-
   const queryParams = req.query;
   const token_hash = stringOrFirstString(queryParams.token_hash);
   const type = stringOrFirstString(queryParams.type);
@@ -28,6 +27,7 @@ export default async function handler(
       type: type as EmailOtpType,
       token_hash,
     });
+
     if (error) {
       console.error(error);
     } else {

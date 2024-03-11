@@ -2,13 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+*,
+::before,
+::after {
+  outline-color: theme('colors.cyan.700');
+}
+
 @layer base {
   body {
     @apply bg-slate-50 text-slate-800;
   }
+
   input {
-    @apply ring-1 ring-slate-800 p-2 rounded-md;
+    @apply ring-1 ring-slate-300 p-2 rounded-md;
   }
+
   label {
     @apply text-sm font-medium;
   }
@@ -16,16 +24,22 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-slate-800 text-yellow-50 ring-1 ring-slate-800 rounded-lg py-2 px-4 duration-150 font-medium hover:shadow-md hover:bg-slate-900;
+    @apply bg-slate-800 text-slate-50 rounded-md py-2 px-4 font-medium hover:shadow-md hover:bg-slate-950;
   }
   .btn-secondary {
-    @apply ring-1 ring-slate-800 text-slate-800 rounded-lg py-2 px-4 duration-300 font-medium hover:shadow-md;
+    @apply ring-1 ring-slate-300 text-slate-800 rounded-md py-2 px-4 duration-300 font-medium hover:shadow-md hover:ring-slate-800;
   }
   .form {
-    @apply bg-slate-50 flex flex-col ring-1 ring-slate-800 p-4 rounded-lg;
+    @apply bg-slate-50 flex flex-col ring-1 ring-slate-300 p-4 rounded-lg;
   }
 
   .tiny-btn {
     @apply text-xs ring-1 ring-slate-800 py-1 px-2 rounded-md font-medium duration-100 hover:bg-slate-800 hover:text-slate-50;
+  }
+}
+
+@layer utilities {
+  .errorMsg {
+    @apply text-red-700;
   }
 }

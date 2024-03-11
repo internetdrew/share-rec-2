@@ -3,13 +3,15 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useEffect, useState } from 'react';
-import Head from 'next/head';
 import FormConfirmationMessage from './FormConfirmationMessage';
 import toast from 'react-hot-toast';
 import { getSupabaseBrowserClient } from '@/utils/supabase/components';
+import { validateUsername } from '@/utils';
 
 interface CreateAccountFormData {
   email: string;
+  displayName: string;
+  username: string;
 }
 
 const createAccountSchema = z.object({
@@ -17,6 +19,22 @@ const createAccountSchema = z.object({
     .string()
     .email({ message: 'Please enter a valid email to login.' })
     .min(5, { message: 'Email address seems a bit...short..?' }),
+  displayName: z
+    .string()
+    .min(2, { message: 'Display names must be at least 2 characters long.' }),
+  username: z
+    .string()
+    .min(3, { message: 'Your username must be at least 3 characters long' })
+    .regex(/^[a-zA-Z0-9_]+$/, {
+      message: 'Usernames can only contain letters, numbers, and underscores',
+    })
+    .refine(
+      async value => {
+        const validationResult = await validateUsername(value);
+        return validationResult?.isAvailable;
+      },
+      { message: 'This username is already taken. Please try another.' }
+    ),
 });
 
 const CreateAccountForm = () => {
@@ -35,6 +53,12 @@ const CreateAccountForm = () => {
   const onConfirm: SubmitHandler<CreateAccountFormData> = async data => {
     const { error } = await supabase.auth.signInWithOtp({
       email: data.email,
+      options: {
+        data: {
+          displayName: data.displayName,
+          username: data.username,
+        },
+      },
     });
 
     if (!error) {
@@ -42,8 +66,7 @@ const CreateAccountForm = () => {
     }
 
     if (error) {
-      const errorStatus = error.status;
-      switch (errorStatus) {
+      switch (error.status) {
         case 429: {
           toast.error(
             'You have made too many requests. Please try again later.'
@@ -65,10 +88,7 @@ const CreateAccountForm = () => {
 
   return (
     <>
-      <Head>
-        <title>Sign up for Let&apos;s Share Recipes</title>
-      </Head>
-      <div className='bg-slate-50 max-w-md mx-auto flex flex-col p-4 rounded-lg ring-1 ring-slate-800 shadow-2xl'>
+      <div className='bg-slate-50 max-w-md mx-auto flex flex-col p-4 rounded-lg ring-1 ring-slate-300 shadow-2xl'>
         {showConfirmationMsg ? (
           <FormConfirmationMessage
             heading='Check your inbox...'
@@ -91,11 +111,33 @@ const CreateAccountForm = () => {
                   {...register('email')}
                 />
                 {errors.email && (
-                  <small className='text-red-700'>{errors.email.message}</small>
+                  <small className='errorMsg'>{errors.email.message}</small>
                 )}
               </div>
+              <div className='flex flex-col gap-1'>
+                <label>Display name</label>
+                <input
+                  type='text'
+                  className='w-full'
+                  placeholder='Ex. Nyesha Arrington'
+                  {...register('displayName')}
+                />
+                <small className='errorMsg'>
+                  {errors.displayName?.message}
+                </small>
+              </div>
+              <div className='flex flex-col gap-1'>
+                <label>Username</label>
+                <input
+                  type='text'
+                  className='w-full'
+                  placeholder='Please enter a username...'
+                  {...register('username')}
+                />
+                <small className='errorMsg'>{errors.username?.message}</small>
+              </div>
               <button className='btn-primary rounded-md'>
-                Confirm my email address
+                Create account{' '}
               </button>
             </form>
             <p className='text-center text-sm mt-6 text-slate-700'>

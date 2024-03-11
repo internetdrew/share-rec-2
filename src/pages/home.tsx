@@ -4,32 +4,49 @@ import { EditProfileModal } from '@/components/EditProfileModal';
 import { getSupabaseServerPropsClient } from '@/utils/supabase/server-props';
 import { getSupabaseBrowserClient } from '@/utils/supabase/components';
 import { User } from '@supabase/supabase-js';
+import { useRouter } from 'next/router';
 
 const Home = ({ user }: { user: User }) => {
   const supabase = getSupabaseBrowserClient();
+  const router = useRouter();
 
   const { data: profileData, isFetching } = useQuery({
     queryKey: ['profile', user.id],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select()
         .eq('id', user.id);
-      return data;
+
+      const profile = data?.[0];
+
+      if (error || !profile) {
+        router.push('/');
+      }
+
+      if (profile) {
+        const { display_name, avatar_url, created_at, ...everythingElse } =
+          profile;
+
+        return {
+          ...everythingElse,
+          displayName: display_name ?? null,
+          avatarUrl: avatar_url,
+          createdAt: created_at,
+        };
+      }
     },
   });
-
-  const userProfile = profileData?.[0];
 
   return (
     <>
       <div>
-        <p>I am the home page for user {user.id}</p>
-        <p>You can message them at {user.email}</p>
-        <p>Call them {user.user_metadata.displayName} if you&apos;re nasty.</p>
+        <p>I am the home page for user {profileData?.id}</p>
+        <p>You can message them at {profileData?.email}</p>
+        <p>Call them {profileData?.displayName} if you&apos;re nasty.</p>
       </div>
-      {!isFetching && !userProfile && (
-        <EditProfileModal profileData={userProfile} email={user.email!} />
+      {!isFetching && !profileData?.username && (
+        <EditProfileModal profileData={profileData} email={user.email!} />
       )}
     </>
   );

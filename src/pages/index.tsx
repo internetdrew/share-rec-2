@@ -5,7 +5,7 @@ import { GetServerSidePropsContext } from 'next';
 export default function Home() {
   return (
     <main>
-      <header className='text-center max-w-4xl mt-16 mx-auto'>
+      <header className='text-center max-w-4xl mt-12 mx-auto'>
         <h1 className='text-3xl font-bold md:text-5xl'>
           Share your favorite recipes, effortlessly!{' '}
         </h1>
@@ -14,7 +14,7 @@ export default function Home() {
           to ask Mom how to make her lasagna ever again.
         </p>
       </header>
-      <section className='mt-10'>
+      <section className='my-10'>
         <CreateAccountForm />
       </section>
     </main>

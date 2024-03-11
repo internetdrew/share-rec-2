@@ -30,6 +30,6 @@ export default async function handler(
   if (error) {
     res.status(500).json({ message: 'Error creating new profile.' });
   } else {
-    res.status(200).json({ message: 'hell yeahs' });
+    res.status(200).json({ message: 'New profile creation successful.' });
   }
 }

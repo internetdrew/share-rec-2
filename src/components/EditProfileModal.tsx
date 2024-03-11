@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-import { Tables } from '@/types/supabase';
 import { z } from 'zod';
 import { FaUser } from 'react-icons/fa';
 import Image from 'next/image';
@@ -7,6 +6,15 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import debounce from 'lodash.debounce';
 import { useMutation } from '@tanstack/react-query';
+
+type UserProfile = {
+  id: string;
+  displayName: string;
+  email: string;
+  username: string;
+  avatarUrl: string | null;
+  createdAt: string;
+};
 
 interface EditProfileModalProps {
   profileData: UserProfile | undefined;
@@ -52,13 +60,12 @@ const editProfileSchema = z.object({
     ),
 });
 
-type UserProfile = Tables<'profiles'>;
-
 export const EditProfileModal = ({
   profileData,
   email,
 }: EditProfileModalProps) => {
   const dialogEl = useRef<HTMLDialogElement>(null);
+
   const createProfile = useMutation({
     mutationFn: (userData: EditProfileFormData) => {
       return fetch('/api/profile/update', {
@@ -116,19 +123,19 @@ export const EditProfileModal = ({
             <p className='text-sm'>Profile photo</p>
             <small className='text-slate-600'>Recommended 300 x 300</small>
             <div className='flex items-center gap-2 mt-2'>
-              <button className='tiny-btn'>Change</button>
-              <button className='tiny-btn'>Remove</button>
+              <button className='text-xs btn-secondary'>Change</button>
+              <button className='text-xs btn-secondary'>Remove</button>
             </div>
           </div>
           <div className='bg-slate-200 ring-1 ring-slate-800 h-16 w-16 rounded-full mr-4 overflow-hidden flex items-center justify-center'>
-            {profileData?.avatar_url ? (
-              <Image src={profileData?.avatar_url} alt='profile image' />
+            {profileData?.avatarUrl ? (
+              <Image src={profileData?.avatarUrl} alt='profile image' />
             ) : (
               <FaUser className='w-1/2 h-1/2' />
             )}
           </div>
         </section>
-        <section className='flex flex-col gap-4 mt-4'>
+        <section className='flex flex-col gap-4 mt-6'>
           <div className='flex flex-col gap-1'>
             <label>Email</label>
             <input
