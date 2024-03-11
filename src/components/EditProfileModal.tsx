@@ -4,8 +4,8 @@ import { FaUser } from 'react-icons/fa';
 import Image from 'next/image';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import debounce from 'lodash.debounce';
 import { useMutation } from '@tanstack/react-query';
+import { validateUsername } from '@/utils';
 
 type UserProfile = {
   id: string;
@@ -27,17 +27,6 @@ interface EditProfileFormData {
   username: string;
 }
 
-const validateUsername = debounce(async value => {
-  if (value) {
-    const res = await fetch(`/api/username/validate?username=${value}`);
-    if (!res.ok) throw new Error('Something went wrong.');
-
-    const data = await res.json();
-    const isUsernameAvailable = data.isAvailable;
-    return isUsernameAvailable;
-  }
-}, 300);
-
 const editProfileSchema = z.object({
   email: z
     .string()
@@ -56,7 +45,7 @@ const editProfileSchema = z.object({
       async value => {
         return await validateUsername(value);
       },
-      { message: 'This username is already taken.' }
+      { message: 'This username is already taken. Please try another one.' }
     ),
 });
 

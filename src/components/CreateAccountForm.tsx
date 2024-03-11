@@ -30,8 +30,7 @@ const createAccountSchema = z.object({
     })
     .refine(
       async value => {
-        const validationResult = await validateUsername(value);
-        return validationResult?.isAvailable;
+        return await validateUsername(value);
       },
       { message: 'This username is already taken. Please try another.' }
     ),
@@ -39,6 +38,7 @@ const createAccountSchema = z.object({
 
 const CreateAccountForm = () => {
   const [showConfirmationMsg, setShowConfirmationMsg] = useState(false);
+  const [accountCreationError, setAccountCreationError] = useState(false);
   const supabase = getSupabaseBrowserClient();
 
   const {
@@ -51,6 +51,7 @@ const CreateAccountForm = () => {
   });
 
   const onConfirm: SubmitHandler<CreateAccountFormData> = async data => {
+    console.log(data);
     const { error } = await supabase.auth.signInWithOtp({
       email: data.email,
       options: {
@@ -66,6 +67,8 @@ const CreateAccountForm = () => {
     }
 
     if (error) {
+      console.log(error);
+      setAccountCreationError(true);
       switch (error.status) {
         case 429: {
           toast.error(
@@ -81,10 +84,10 @@ const CreateAccountForm = () => {
   };
 
   useEffect(() => {
-    if (isSubmitSuccessful) {
+    if (!accountCreationError && isSubmitSuccessful) {
       reset();
     }
-  }, [isSubmitSuccessful, reset]);
+  }, [accountCreationError, isSubmitSuccessful, reset]);
 
   return (
     <>

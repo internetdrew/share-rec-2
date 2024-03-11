@@ -10,8 +10,7 @@ export default function Home() {
           Share your favorite recipes, effortlessly!{' '}
         </h1>
         <p className='text-lg mt-4 text-gray-800 max-w-2xl mx-auto'>
-          Share recipes with friends, modify recipes from others, and never have
-          to ask Mom how to make her lasagna ever again.
+          And never have to call Mom for her famous lasagna ever again.
         </p>
       </header>
       <section className='my-10'>
