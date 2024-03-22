@@ -36,6 +36,7 @@ const Home = ({ user }: { user: User }) => {
         };
       }
     },
+    
   });
 
   return (

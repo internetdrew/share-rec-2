@@ -26,7 +26,7 @@ const createAccountSchema = z.object({
     .string()
     .min(3, { message: 'Your username must be at least 3 characters long' })
     .regex(/^[a-zA-Z0-9_]+$/, {
-      message: 'Usernames can only contain letters, numbers, and underscores',
+      message: 'Usernames can only contain letters, numbers, and underscores.',
     })
     .refine(
       async value => {
@@ -51,7 +51,6 @@ const CreateAccountForm = () => {
   });
 
   const onConfirm: SubmitHandler<CreateAccountFormData> = async data => {
-    console.log(data);
     const { error } = await supabase.auth.signInWithOtp({
       email: data.email,
       options: {
