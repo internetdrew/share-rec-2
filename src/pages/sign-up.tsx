@@ -1,9 +1,9 @@
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { createBrowserClient } from '@supabase/ssr';
-import { useEffect, useState } from 'react';
 import Head from 'next/head';
 
 interface ConfirmEmailData {

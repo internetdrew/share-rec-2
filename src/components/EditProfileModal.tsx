@@ -1,11 +1,10 @@
 import React, { useEffect, useRef } from 'react';
-import { z } from 'zod';
-import { FaUser } from 'react-icons/fa';
 import Image from 'next/image';
+import { FaUser } from 'react-icons/fa';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { validateUsername } from '@/utils';
+import { editProfileSchema } from '@/schemas';
 
 type UserProfile = {
   id: string;
@@ -19,50 +18,19 @@ type UserProfile = {
 interface EditProfileModalProps {
   profileData: UserProfile | undefined;
   email: string;
+  displayName: string;
+  username: string;
 }
 
 interface EditProfileFormData {
   email: string;
   displayName: string;
   username: string;
+  avatar: string;
 }
 
-const editProfileSchema = z.object({
-  email: z
-    .string()
-    .email({ message: 'Please enter a valid email to login.' })
-    .min(5, { message: 'Email address seems a bit...short..?' }),
-  displayName: z
-    .string()
-    .min(2, { message: 'Display names must be at least 2 characters long.' }),
-  username: z
-    .string()
-    .min(3, { message: 'Your username must be at least 3 characters long' })
-    .regex(/^[a-zA-Z0-9_]+$/, {
-      message: 'Usernames can only contain letters, numbers, and underscores',
-    })
-    .refine(
-      async value => {
-        return await validateUsername(value);
-      },
-      { message: 'This username is already taken. Please try another one.' }
-    ),
-});
-
-export const EditProfileModal = ({
-  profileData,
-  email,
-}: EditProfileModalProps) => {
-  const dialogEl = useRef<HTMLDialogElement>(null);
-
-  const createProfile = useMutation({
-    mutationFn: (userData: EditProfileFormData) => {
-      return fetch('/api/profile/update', {
-        method: 'POST',
-        body: JSON.stringify(userData),
-      });
-    },
-  });
+export const EditProfileModal = (props: EditProfileModalProps) => {
+  const { profileData, email, displayName, username } = props;
 
   const {
     register,
@@ -73,6 +41,21 @@ export const EditProfileModal = ({
     resolver: zodResolver(editProfileSchema),
     defaultValues: {
       email,
+      displayName,
+      username,
+    },
+  });
+
+  const dialogEl = useRef<HTMLDialogElement>(null);
+  const avatarInputRef = useRef<HTMLInputElement | null>(null);
+  const { ref: avatarRef, ...restOfAvatarRegister } = register('avatar');
+
+  const createProfile = useMutation({
+    mutationFn: (userData: EditProfileFormData) => {
+      return fetch('/api/profile/update', {
+        method: 'POST',
+        body: JSON.stringify(userData),
+      });
     },
   });
 
@@ -123,6 +106,16 @@ export const EditProfileModal = ({
               <FaUser className='w-1/2 h-1/2' />
             )}
           </div>
+          <input
+            {...restOfAvatarRegister}
+            type='file'
+            name='avatar'
+            className='sr-only'
+            ref={e => {
+              avatarRef(e);
+              avatarInputRef.current = e;
+            }}
+          />
         </section>
         <section className='flex flex-col gap-4 mt-6'>
           <div className='flex flex-col gap-1'>

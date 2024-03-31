@@ -11,7 +11,7 @@ const Home = ({ user }: { user: User }) => {
   const router = useRouter();
 
   const { data: profileData, isFetching } = useQuery({
-    queryKey: ['profile', user.id],
+    queryKey: ['fetchProfile', user.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
@@ -30,13 +30,12 @@ const Home = ({ user }: { user: User }) => {
 
         return {
           ...everythingElse,
-          displayName: display_name ?? null,
+          displayName: display_name,
           avatarUrl: avatar_url,
           createdAt: created_at,
         };
       }
     },
-    
   });
 
   return (
@@ -46,8 +45,13 @@ const Home = ({ user }: { user: User }) => {
         <p>You can message them at {profileData?.email}</p>
         <p>Call them {profileData?.displayName} if you&apos;re nasty.</p>
       </div>
-      {!isFetching && !profileData?.username && (
-        <EditProfileModal profileData={profileData} email={user.email!} />
+      {!isFetching && !profileData && (
+        <EditProfileModal
+          profileData={profileData}
+          email={user.email!}
+          displayName={user?.user_metadata?.displayName}
+          username={user?.user_metadata?.username}
+        />
       )}
     </>
   );

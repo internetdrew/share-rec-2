@@ -30,32 +30,6 @@ export default async function handler(
       res.redirect('/error');
     }
 
-    const userId = authData?.user?.id!;
-    const email = authData?.user?.email!;
-    const confirmedAt = authData?.user?.confirmed_at;
-    const { displayName, username } =
-      authData?.user?.user_metadata?.displayName;
-
-    const { data: profileData } = await supabase
-      .from('profiles')
-      .select()
-      .eq('id', userId);
-    console.log(profileData);
-
-    if (!profileData?.length) {
-      const { data, error } = await supabase.from('profiles').insert({
-        id: userId,
-        email: email,
-        created_at: confirmedAt,
-        display_name: displayName,
-        username: username,
-      });
-
-      if (error) {
-        res.redirect('/error');
-      }
-    }
-
     res.redirect('/home');
   }
 }

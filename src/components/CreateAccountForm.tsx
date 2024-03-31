@@ -7,6 +7,7 @@ import FormConfirmationMessage from './FormConfirmationMessage';
 import toast from 'react-hot-toast';
 import { getSupabaseBrowserClient } from '@/utils/supabase/components';
 import { validateUsername } from '@/utils';
+import { SIGNUP_FORM_FIELD_LENGTHS } from '@/constants';
 
 interface CreateAccountFormData {
   email: string;
@@ -24,7 +25,9 @@ const createAccountSchema = z.object({
     .min(2, { message: 'Display names must be at least 2 characters long.' }),
   username: z
     .string()
-    .min(3, { message: 'Your username must be at least 3 characters long' })
+    .min(SIGNUP_FORM_FIELD_LENGTHS.minUsernameChars, {
+      message: `Your username must be at least ${SIGNUP_FORM_FIELD_LENGTHS.minUsernameChars} characters long`,
+    })
     .regex(/^[a-zA-Z0-9_]+$/, {
       message: 'Usernames can only contain letters, numbers, and underscores.',
     })
